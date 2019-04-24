@@ -8,20 +8,21 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to the Alexa Skills Kit, you can say hello!';
+    const speechText = WELCOME_MESSAGE + SKILL_NAME;
+    const quest = "Que";
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard(SKILL_NAME, speechText)
       .getResponse();
   },
 };
 
 const HelloWorldIntentHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent';
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent';
   },
   handle(handlerInput) {
     const speechText = 'Hello World!';
@@ -33,10 +34,25 @@ const HelloWorldIntentHandler = {
   },
 };
 
+const PickACharacter = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'PickCharacter';
+  },
+  handle(handlerInput) {
+    const speechText = PICK_A_CHARACTER;
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withSimpleCard(CHARACTER_TITTLE, speechText)
+      .reprompt(PICK_A_CHARACTER_REPROMT)
+      .getResponse()
+  },
+};
+
 const HelpIntentHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
     const speechText = 'You can say hello to me!';
@@ -49,18 +65,32 @@ const HelpIntentHandler = {
   },
 };
 
-const CancelAndStopIntentHandler = {
+const CancelIntentHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
-        || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    const speechText = CANCEL_MESSAGE;
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard(SKILL_NAME, speechText)
+      .getResponse();
+  },
+};
+
+const StopIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+  },
+  handle(handlerInput) {
+    const speechText = EXIT_MESSAGE;
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withSimpleCard(SKILL_NAME, speechText)
       .getResponse();
   },
 };
@@ -90,15 +120,35 @@ const ErrorHandler = {
   },
 };
 
+
+
 const skillBuilder = Alexa.SkillBuilders.custom();
 
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     HelloWorldIntentHandler,
+    PickACharacter,
     HelpIntentHandler,
-    CancelAndStopIntentHandler,
+    StopIntentHandler,
+    ExitIntentHandler,
     SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
   .lambda();
+
+const languageString = {
+  'es-MX': {
+    'translation': {
+      SKILL_NAME: 'Trip Academy',
+      HELP_MESSAGE: 'En que te puedo ayudar?',
+      CANCEL_MESSAGE: 'Muy bien',
+      EXIT_MESSAGE: 'Un placer jugar contigo, hasta la proxima',
+      WELCOME_MESSAGE: 'Bienvenido a la skill de ',
+      PICK_A_CHARACTER: 'Para jugar debes elegir a uno de nuestros personajes',
+      PICK_A_CHARACTER_REPROMT: 'Por favor, elige uno de los personajes',
+      CHARACTER_TITTLE: 'Elige un Personaje',
+      CHARACTER_QUESTION: 'Con que personaje te gustaria jugar?',
+    },
+  },
+};
